@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+
+# This script automates a common pattern:
+#
+# 1. Copy the `.env.example` file to `.env`
+# 2. Grab the config from Heroku staging
+# 3. Copy/paste for lines with REPLACE in them
+#
+# Note: this script assumes you named your Heroku staging remote `staging`.
+
+def config_from_raw(raw_config)
+  config = Hash.new
+
+  raw_config.split("\n").select { |line| line.match(/:\s/) }.each do |line|
+    key, value = line.split(/:\s+/)
+    config[key] = value
+  end
+
+  config
+end
+
+raw_config = `heroku config -r staging`
+config = config_from_raw(raw_config)
+
+File.open('.env', 'w') do |file|
+  File.readlines('.env.example').each do |line|
+    if line.match(/REPLACE/)
+      key = line.split('=').first
+      value = config[key]
+
+      line = [key, value].join('=')
+    end
+
+    file.puts line
+  end
+end
