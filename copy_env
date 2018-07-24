@@ -3,10 +3,22 @@
 # This script automates a common pattern:
 #
 # 1. Copy the `.env.example` file to `.env`
-# 2. Grab the config from Heroku staging
+# 2. Grab the config from Heroku or Hokusai staging
 # 3. Copy/paste for lines with REPLACE in them
 #
 # Note: this script assumes you named your Heroku staging remote `staging`.
+
+source = ARGV[0] || "heroku"
+
+unless ["heroku", "hokusai"].include? source
+  print <<~EOF
+  Usage: copy_env [heroku | hokusai]
+
+  Please supply 'heroku' or 'hokusai' as the source for
+  the configuration to be copied to your local .env
+  EOF
+  exit 1
+end
 
 def config_from_raw(raw_config)
   config = Hash.new
@@ -19,7 +31,20 @@ def config_from_raw(raw_config)
   config
 end
 
-raw_config = `heroku config -r staging`
+def fetch_config(source)
+  if source == 'heroku'
+    `heroku config -r staging`
+
+  elsif source == 'hokusai'
+    `hokusai staging env get`.gsub(/=/, ': ')
+
+  else
+    puts "Unrecognized source: #{source}"
+    exit 1
+  end
+end
+
+raw_config = fetch_config(source)
 config = config_from_raw(raw_config)
 
 File.open('.env', 'w') do |file|
