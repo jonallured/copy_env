@@ -3,8 +3,8 @@
 A simple script to automate the pattern of:
 
 * copy `.env.example` to `.env`
-* grab config from Heroku or Hokusai staging
-* replace values in `.env` with Heroku or Hokusai values
+* grab config from Hokusai or Heroku staging
+* replace values in `.env` with those config values
 
 ## Install
 
