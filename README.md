@@ -1,5 +1,7 @@
 # copy\_env
 
+**NOTE THIS REPO IS STALE AND DOESN'T MATCH ARTSY BEST PRACTICES ANYMORE!!**
+
 A simple script to automate the pattern of:
 
 * copy `.env.example` to `.env`
